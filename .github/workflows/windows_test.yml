@@ -37,5 +37,8 @@ jobs:
     - name: Check out assets for integration tests
       run: git clone https://github.com/aquasecurity/trivy-test-images.git test/integration/testdata/fixtures
 
+    - name: Set up bridge network
+      run: docker network create --driver nat bridge
+
     - name: Run integration tests
       run: go test -v -tags="integration" ./test/integration/...
