@@ -57,6 +57,7 @@ func TestTLSRegistry(t *testing.T) {
 		BindMounts: map[string]string{
 			filepath.Join(baseDir, "data", "registry", "certs"): "/certs",
 			filepath.Join(baseDir, "data", "registry", "auth"):  "/auth",
+			"/usr/local/bin/docker":                             "/usr/bin/docker",
 		},
 		WaitingFor: wait.ForLog("listening on [::]:5443"),
 	}
@@ -64,9 +65,6 @@ func TestTLSRegistry(t *testing.T) {
 	registryC, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
 		ContainerRequest: req,
 		Started:          true,
-		BindMounts: map[string]string{
-			"/usr/local/bin/docker": "/usr/bin/docker",
-		},
 	})
 	require.NoError(t, err)
 	defer registryC.Terminate(ctx)
