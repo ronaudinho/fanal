@@ -10,7 +10,6 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
-	"path/filepath"
 	"sort"
 	"strings"
 	"testing"
@@ -175,9 +174,7 @@ func TestFanal_Library_DockerMode(t *testing.T) {
 			cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 			require.NoError(t, err, tc.name)
 
-			imageFile := filepath.Clean(tc.imageFile)
-
-			testfile, err := os.Open(imageFile)
+			testfile, err := os.Open(tc.imageFile)
 			require.NoError(t, err)
 
 			// load image into docker engine
@@ -186,10 +183,10 @@ func TestFanal_Library_DockerMode(t *testing.T) {
 			io.Copy(ioutil.Discard, resp.Body)
 
 			// tag our image to something unique
-			err = cli.ImageTag(ctx, tc.imageName, imageFile)
+			err = cli.ImageTag(ctx, tc.imageName, tc.imageFile)
 			require.NoError(t, err, tc.name)
 
-			img, cleanup, err := image.NewDockerImage(ctx, imageFile, opt)
+			img, cleanup, err := image.NewDockerImage(ctx, tc.imageFile, opt)
 			require.NoError(t, err, tc.name)
 			defer cleanup()
 
@@ -205,7 +202,7 @@ func TestFanal_Library_DockerMode(t *testing.T) {
 			require.NoError(t, c.Clear(), tc.name)
 
 			// remove Image
-			_, err = cli.ImageRemove(ctx, imageFile, dtypes.ImageRemoveOptions{
+			_, err = cli.ImageRemove(ctx, tc.imageFile, dtypes.ImageRemoveOptions{
 				Force:         true,
 				PruneChildren: true,
 			})

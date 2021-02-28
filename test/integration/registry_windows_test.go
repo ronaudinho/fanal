@@ -1,4 +1,4 @@
-// +build integration,!windows
+// +build integration
 
 package integration
 
@@ -64,6 +64,9 @@ func TestTLSRegistry(t *testing.T) {
 	registryC, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
 		ContainerRequest: req,
 		Started:          true,
+		BindMounts: map[string]string{
+			"/usr/local/bin/docker": "/usr/bin/docker",
+		},
 	})
 	require.NoError(t, err)
 	defer registryC.Terminate(ctx)
