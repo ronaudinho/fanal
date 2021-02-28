@@ -1,0 +1,44 @@
+name: Windows Test
+on: push
+jobs:
+  unittest:
+    name: Unit Test
+    runs-on: windows-latest
+    steps:
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v1 
+
+    - name: Getting cached dependencies
+      uses: actions/cache@v2
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+
+    - name: Run unit tests
+      run: go test ./...
+
+  integration:
+    name: Integration Test
+    runs-on: windows-latest
+    steps:
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v1
+
+    - name: Getting cached dependencies
+      uses: actions/cache@v2
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+
+    - name: Check out assets for integration tests
+      run: git clone https://github.com/aquasecurity/trivy-test-images.git test/integration/testdata/fixtures
+
+    - name: Set up bridge network
+      run: docker network create --driver nat bridge
+
+    - name: Run integration tests
+      run: go test -v -tags="integration" ./test/integration/...
