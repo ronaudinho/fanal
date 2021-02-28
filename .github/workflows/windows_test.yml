@@ -1,0 +1,25 @@
+name: Windows Test
+on: push
+jobs:
+  unittest:
+    name: Unit Test
+    runs-on: windows-latest
+    steps:
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v1 
+
+    - name: Run unit tests
+      run: go test ./...
+
+  integration:
+    name: Integration Test
+    runs-on: windows-latest
+    steps:
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v1
+
+    - name: Check out assets for integration tests
+      run: git clone https://github.com/aquasecurity/trivy-test-images.git test/integration/testdata/fixtures
+
+    - name: Run integration tests
+      run: go test -v -tags="integration" ./test/integration/...
